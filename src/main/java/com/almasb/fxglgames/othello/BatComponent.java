@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-package com.almasb.fxglgames.pong;
+package com.almasb.fxglgames.othello;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.component.Component;
@@ -47,7 +47,7 @@ public class BatComponent extends Component {
     }
 
     public void down() {
-        if (entity.getBottomY() <= FXGL.getAppHeight() - (BAT_SPEED / 60))
+            if (entity.getBottomY() <= FXGL.getAppHeight() - (BAT_SPEED / 60))
             physics.setVelocityY(BAT_SPEED);
         else
             stop();

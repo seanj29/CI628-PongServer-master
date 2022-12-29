@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-package com.almasb.fxglgames.pong;
+package com.almasb.fxglgames.othello;
 
 /**
  * @author Almas Baimagambetov (AlmasB) (almaslvl@gmail.com)

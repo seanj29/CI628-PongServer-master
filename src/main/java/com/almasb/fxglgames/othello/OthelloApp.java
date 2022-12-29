@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-package com.almasb.fxglgames.pong;
+package com.almasb.fxglgames.othello;
 
 import com.almasb.fxgl.animation.Interpolators;
 import com.almasb.fxgl.app.ApplicationMode;
@@ -52,7 +52,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
-import static com.almasb.fxglgames.pong.NetworkMessages.*;
+import static com.almasb.fxglgames.othello.NetworkMessages.*;
 
 /**
  * A simple clone of Pong.
@@ -60,13 +60,15 @@ import static com.almasb.fxglgames.pong.NetworkMessages.*;
  *
  * @author Almas Baimagambetov (AlmasB) (almaslvl@gmail.com)
  */
-public class PongApp extends GameApplication implements MessageHandler<String> {
+public class OthelloApp extends GameApplication implements MessageHandler<String> {
 
     @Override
     protected void initSettings(GameSettings settings) {
-        settings.setTitle("Pong");
+        settings.setHeight(800);
+        settings.setWidth(600);
+        settings.setTitle("Othello");
         settings.setVersion("1.0");
-        settings.setFontUI("pong.ttf");
+        settings.setFontUI("othello.ttf");
         settings.setApplicationMode(ApplicationMode.DEBUG);
     }
 

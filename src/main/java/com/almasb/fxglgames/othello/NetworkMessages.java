@@ -1,4 +1,4 @@
-package com.almasb.fxglgames.pong;
+package com.almasb.fxglgames.othello;
 
 /**
  * @author Almas Baimagambetov (almaslvl@gmail.com)

@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-package com.almasb.fxglgames.pong;
+package com.almasb.fxglgames.othello;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.ui.UIController;
