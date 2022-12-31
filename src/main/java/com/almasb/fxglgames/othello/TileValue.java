@@ -29,6 +29,12 @@ package com.almasb.fxglgames.othello;
 /**
  * @author Almas Baimagambetov (AlmasB) (almaslvl@gmail.com)
  */
-public enum  EntityType {
-    PLAYER_BAT, ENEMY_BAT, BALL, WALL
+public enum TileValue {
+    B("B"), O("W"), NONE("");
+
+    final String symbol;
+
+    TileValue(String symbol) {
+        this.symbol = symbol;
+    }
 }

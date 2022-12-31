@@ -17,7 +17,7 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -27,33 +27,33 @@
 package com.almasb.fxglgames.othello;
 
 import com.almasb.fxgl.dsl.FXGL;
-import com.almasb.fxgl.entity.component.Component;
-import com.almasb.fxgl.physics.PhysicsComponent;
+import com.almasb.fxgl.entity.Entity;
+import com.almasb.fxgl.entity.EntityFactory;
+import com.almasb.fxgl.entity.SpawnData;
+import com.almasb.fxgl.entity.Spawns;
+import com.almasb.fxgl.physics.BoundingShape;
+import com.almasb.fxgl.physics.HitBox;
+
+import static com.almasb.fxgl.dsl.FXGL.entityBuilder;
+import static com.almasb.fxgl.dsl.FXGL.getAppHeight;
+import static com.almasb.fxgl.dsl.FXGLForKtKt.getAppWidth;
 
 /**
  * @author Almas Baimagambetov (AlmasB) (almaslvl@gmail.com)
  */
-public class BatComponent extends Component {
+public class OthelloFactory implements EntityFactory {
 
-    private static final double BAT_SPEED = 420;
+    @Spawns("gridcell")
+    public Entity newGridCell(SpawnData data) {
+        double x = data.getX();
+        double y = data.getY();
+        Entity gridCell = entityBuilder(data)
+                .bbox(new HitBox(BoundingShape.box((getAppWidth() / 8), getAppHeight() / 8)))
+                .with(new GridCellComponent(x, y))
+                .build();
 
-    protected PhysicsComponent physics;
+        gridCell.getViewComponent().addOnClickHandler(e -> FXGL.<OthelloApp>getAppCast().cellClicked(gridCell));
 
-    public void up() {
-        if (entity.getY() >= BAT_SPEED / 60)
-            physics.setVelocityY(-BAT_SPEED);
-        else
-            stop();
+        return gridCell;
+    };
     }
-
-    public void down() {
-            if (entity.getBottomY() <= FXGL.getAppHeight() - (BAT_SPEED / 60))
-            physics.setVelocityY(BAT_SPEED);
-        else
-            stop();
-    }
-
-    public void stop() {
-        physics.setLinearVelocity(0, 0);
-    }
-}
