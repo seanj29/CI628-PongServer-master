@@ -24,36 +24,17 @@
  * SOFTWARE.
  */
 
-package com.almasb.fxglgames.othello;
-
-import com.almasb.fxgl.dsl.FXGL;
-import com.almasb.fxgl.entity.Entity;
-import com.almasb.fxgl.entity.EntityFactory;
-import com.almasb.fxgl.entity.SpawnData;
-import com.almasb.fxgl.entity.Spawns;
-import com.almasb.fxgl.physics.BoundingShape;
-import com.almasb.fxgl.physics.HitBox;
-
-import static com.almasb.fxgl.dsl.FXGL.entityBuilder;
-import static com.almasb.fxgl.dsl.FXGL.getAppHeight;
-import static com.almasb.fxgl.dsl.FXGLForKtKt.getAppWidth;
+package com.almasb.fxglgames.tictactoe;
 
 /**
  * @author Almas Baimagambetov (AlmasB) (almaslvl@gmail.com)
  */
-public class OthelloFactory implements EntityFactory {
+public enum TileValue {
+    X("X"), O("O"), NONE("");
 
-    @Spawns("gridcell")
-    public Entity newGridCell(SpawnData data) {
-        double x = data.getX();
-        double y = data.getY();
-        Entity gridCell = entityBuilder(data)
-                .bbox(new HitBox(BoundingShape.box((getAppWidth() / 8), getAppHeight() / 8)))
-                .with(new GridCellComponent(x, y))
-                .build();
+    final String symbol;
 
-        gridCell.getViewComponent().addOnClickHandler(e -> FXGL.<OthelloApp>getAppCast().cellClicked(gridCell));
-
-        return gridCell;
-    };
+    TileValue(String symbol) {
+        this.symbol = symbol;
     }
+}

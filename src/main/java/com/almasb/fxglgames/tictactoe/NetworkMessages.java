@@ -1,4 +1,4 @@
-package com.almasb.fxglgames.othello;
+package com.almasb.fxglgames.tictactoe;
 
 /**
  * @author Almas Baimagambetov (almaslvl@gmail.com)

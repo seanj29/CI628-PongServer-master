@@ -24,17 +24,34 @@
  * SOFTWARE.
  */
 
-package com.almasb.fxglgames.othello;
+package com.almasb.fxglgames.tictactoe;
+
+import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.entity.Entity;
+import com.almasb.fxgl.entity.EntityFactory;
+import com.almasb.fxgl.entity.SpawnData;
+import com.almasb.fxgl.entity.Spawns;
+import com.almasb.fxgl.physics.BoundingShape;
+import com.almasb.fxgl.physics.HitBox;
+import javafx.scene.input.MouseEvent;
+
+import static com.almasb.fxgl.dsl.FXGL.entityBuilder;
+import static com.almasb.fxgl.dsl.FXGL.getAppWidth;
 
 /**
  * @author Almas Baimagambetov (AlmasB) (almaslvl@gmail.com)
  */
-public enum TileValue {
-    B("B"), O("W"), NONE("");
+public class TicTacToe implements EntityFactory {
 
-    final String symbol;
+    @Spawns("tile")
+    public Entity newTile(SpawnData data) {
+        var tile = entityBuilder(data)
+                .bbox(new HitBox(BoundingShape.box(getAppWidth() / 3, getAppWidth() / 3)))
+                .with(new GridCellComponent())
+                .build();
 
-    TileValue(String symbol) {
-        this.symbol = symbol;
+        tile.getViewComponent().addEventHandler(MouseEvent.MOUSE_CLICKED, e -> FXGL.<TicTacToeApp>getAppCast().onUserMove(tile));
+
+        return tile;
     }
-}
+    }

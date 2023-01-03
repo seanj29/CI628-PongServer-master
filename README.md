@@ -1,5 +1,5 @@
 # CI628-PongServer
-A simple server for multiplayer com.almasb.fxglgames.othello.
+A simple server for multiplayer com.almasb.fxglgames.tictactoe.
 
 ### Run pre-built binary
 
