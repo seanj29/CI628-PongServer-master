@@ -39,10 +39,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.util.Duration;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +61,7 @@ public class TicTacToeApp extends GameApplication implements MessageHandler<Stri
     protected void initSettings(GameSettings settings) {
         settings.setHeight(600);
         settings.setWidth(800);
-        settings.setTitle("Othello");
+        settings.setTitle("TicTacToe");
         settings.setVersion("1.0");
         settings.setFontUI("pong.ttf");
         settings.setApplicationMode(ApplicationMode.DEBUG);
@@ -73,12 +70,17 @@ public class TicTacToeApp extends GameApplication implements MessageHandler<Stri
     private Entity[][] board = new Entity[3][3];
     private List<TileCombo> combos = new ArrayList<>();
 
-    private boolean playerXTurn = true;
+    private Boolean playerXTurn = true;
 
     public List<TileCombo> getCombos() {
         return combos;
     }
     private Server<String> server;
+    private int[] clientIndex;
+    public int indexso(){
+        System.out.println(Arrays.toString(clientIndex));
+        return 0;
+    }
 
 
 
@@ -121,50 +123,36 @@ public class TicTacToeApp extends GameApplication implements MessageHandler<Stri
 
         server.setOnConnected(connection -> {
             connection.addMessageHandlerFX(this);
-        });
 
-//
-        var t = new Thread(server.startTask()::run);
-        t.setDaemon(true);
-        t.start();
+        });
+        server.setOnDisconnected(connection -> {
+        });
+        server.startAsync();
     }
 
 
-//        public String toString()
-//        {
-//            StringBuilder s = new StringBuilder();
-//            isEmpty = false;
-//            for(int i=0;i<3;i++)
-//            {
-//                for(int j=0;j<3;j++)
-//                {
-//                    switch(board[i][j])
-//                    {
-//                        case X:
-//                            s.append(" X ");
-//                            break;
-//                        case O:
-//                            s.append(" O ");
-//                            break;
-//                        case EMPTY:
-//                            s.append("   ");
-//                            isEmpty=true;
-//                            break;
-//                    }
-//                    if(j<2)
-//                    {
-//                        s.append("|");
-//                    }
-//
-//                }
-//                if(i<2)
-//                {
-//                    s.append("\n-----------\n");
-//                }
-//            }
-//            return s.toString();
-//        }
-//    }
+        public String BoardToString()
+        {
+            StringBuilder s = new StringBuilder();
+            for(int j=0;j<3;j++) {
+                for (int i = 0; i < 3; i++) {
+                    switch (board[i][j].getComponent(GridCellComponent.class).getValue()) {
+                        case X:
+                            s.append("X");
+                            break;
+                        case O:
+                            s.append("O");
+                            break;
+                        case NONE:
+                            s.append("E");
+                            break;
+
+                    }
+                }
+            }
+            return s.toString();
+        }
+
 //    @Override
 //    protected void initPhysics() {
 //        getPhysicsWorld().setGravity(0, 0);
@@ -211,9 +199,9 @@ public class TicTacToeApp extends GameApplication implements MessageHandler<Stri
     @Override
     protected void onUpdate(double tpf) {
         if (!server.getConnections().isEmpty()) {
-            var message = ("GAME_DATA," +   "," + ",") ;
-
+            var message = ("GAME_DATA," + BoardToString() + "," + playerXTurn.toString() + "," + 3 + "," + 4) ;
             server.broadcast(message);
+
         }
     }
 
@@ -371,6 +359,7 @@ public class TicTacToeApp extends GameApplication implements MessageHandler<Stri
             playerXTurn = true;
             }
         checkGameFinished();
+        toString();
         }
     public static void main(String[] args) {
         launch(args);
