@@ -35,6 +35,8 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.util.Duration;
@@ -125,9 +127,8 @@ public class TicTacToeApp extends GameApplication implements MessageHandler<Stri
             connection.addMessageHandlerFX(this);
 
         });
-        server.setOnDisconnected(connection -> {
-        });
         server.startAsync();
+        onUserMove(board[0][0]);
     }
 
 
@@ -153,56 +154,25 @@ public class TicTacToeApp extends GameApplication implements MessageHandler<Stri
             return s.toString();
         }
 
-//    @Override
-//    protected void initPhysics() {
-//        getPhysicsWorld().setGravity(0, 0);
-//
-//        getPhysicsWorld().addCollisionHandler(new CollisionHandler(TileValue.BALL, TileValue.WALL) {
-//            @Override
-//            protected void onHitBoxTrigger(Entity a, Entity b, HitBox boxA, HitBox boxB) {
-//                if (boxB.getName().equals("LEFT")) {
-//                    inc("player2score", +1);
-//
-//                    server.broadcast("SCORES," + geti("player1score") + "," + geti("player2score"));
-//
-//                    server.broadcast(HIT_WALL_LEFT);
-//                } else if (boxB.getName().equals("RIGHT")) {
-//                    inc("player1score", +1);
-//
-//                    server.broadcast("SCORES," + geti("player1score") + "," + geti("player2score"));
-//
-//                    server.broadcast(HIT_WALL_RIGHT);
-//                } else if (boxB.getName().equals("TOP")) {
-//                    server.broadcast(HIT_WALL_UP);
-//                } else if (boxB.getName().equals("BOT")) {
-//                    server.broadcast(HIT_WALL_DOWN);
-//                }
-//
-//                getGameScene().getViewport().shakeTranslational(5);
-//            }
-//        });
-//
-//        CollisionHandler ballBatHandler = new CollisionHandler(TileValue.BALL, TileValue.PLAYER_BAT) {
-//            @Override
-//            protected void onCollisionBegin(Entity a, Entity bat) {
-//                playHitAnimation(bat);
-//
-//                server.broadcast(bat == player1 ? BALL_HIT_BAT1 : BALL_HIT_BAT2);
-//            }
-//        };
-//
-//        getPhysicsWorld().addCollisionHandler(ballBatHandler);
-//        getPhysicsWorld().addCollisionHandler(ballBatHandler.copyFor(TileValue.BALL, TileValue.ENEMY_BAT));
-//    }
-
 
     @Override
     protected void onUpdate(double tpf) {
-        if (!server.getConnections().isEmpty()) {
-            var message = ("GAME_DATA," + BoardToString() + "," + playerXTurn.toString() + "," + 3 + "," + 4) ;
-            server.broadcast(message);
+        List<Connection<String>> connections = server.getConnections();
+        var message = ("GAME_DATA," + BoardToString() + "," + playerXTurn.toString() + "," + checkGameFinished() + ",") ;
+
+        if (!connections.isEmpty() && connections.size() < 2) {
+
+                for (int i = 0; i < connections.size(); i++) {
+                    connections.get(i).send(message + (i+1));
+                }
 
         }
+        else if (!connections.isEmpty() && connections.size() >= 2) {
+            for (int i = 0; i < 1; i++) {
+                connections.get(i).send(message + (i+1));
+            }
+        }
+
     }
 
 
@@ -211,12 +181,11 @@ public class TicTacToeApp extends GameApplication implements MessageHandler<Stri
     @Override
     public void onReceive(Connection<String> connection, String message) {
         var tokens = message.split(",");
-
         Arrays.stream(tokens).skip(1).forEach(key -> {
-            if (key.endsWith("_DOWN")) {
-                getInput().mockKeyPress(KeyCode.valueOf(key.substring(0, 1)));
-            } else if (key.endsWith("_UP")) {
-                getInput().mockKeyRelease(KeyCode.valueOf(key.substring(0, 1)));
+            if (key.contains("_DOWN")) {
+                getInput().mockButtonPress(MouseButton.PRIMARY,0, 0);
+            } else if (key.contains("_UP")) {
+                getInput().mockButtonRelease(MouseButton.PRIMARY, 18, 18);
             }
         });
     }
