@@ -34,9 +34,6 @@ import com.almasb.fxgl.net.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.util.Duration;
@@ -45,14 +42,13 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
 
 /**
- * A simple animated game of Othello
+ * A simple animated game of TicTacToe
  * Sounds from https://freesound.org/people/NoiseCollector/sounds/4391/ under CC BY 3.0.
  *
  * @author Almas Baimagambetov (AlmasB) (almaslvl@gmail.com)
@@ -74,23 +70,14 @@ public class TicTacToeApp extends GameApplication implements MessageHandler<Stri
 
     private Boolean playerXTurn = true;
 
+    private Boolean clientisX = true;
+
+    private Boolean symbolChosen = false;
     public List<TileCombo> getCombos() {
         return combos;
     }
     private Server<String> server;
-    private int[] clientIndex;
-    public int indexso(){
-        System.out.println(Arrays.toString(clientIndex));
-        return 0;
-    }
 
-
-
-    @Override
-    protected void initGameVars(Map<String, Object> vars) {
-        vars.put("player1score", 0);
-        vars.put("player2score", 0);
-    }
 
     @Override
     protected void initGame() {
@@ -128,7 +115,6 @@ public class TicTacToeApp extends GameApplication implements MessageHandler<Stri
 
         });
         server.startAsync();
-        onUserMove(board[0][0]);
     }
 
 
@@ -158,19 +144,20 @@ public class TicTacToeApp extends GameApplication implements MessageHandler<Stri
     @Override
     protected void onUpdate(double tpf) {
         List<Connection<String>> connections = server.getConnections();
-        var message = ("GAME_DATA," + BoardToString() + "," + playerXTurn.toString() + "," + checkGameFinished() + ",") ;
+        var message = ("GAME_DATA," + BoardToString() + "," + checkGameFinished() + "," + symbolChosen + "," ) ;
 
-        if (!connections.isEmpty() && connections.size() < 2) {
+        if (!connections.isEmpty()) {
 
                 for (int i = 0; i < connections.size(); i++) {
-                    connections.get(i).send(message + (i+1));
+                    String messageFull;
+                    if (i == 0) {
+                        messageFull = message.concat(clientisX + "," + connections.get(i).getConnectionNum() + ",");
+                    }
+                    else {
+                        messageFull = message.concat(!clientisX + "," + connections.get(i).getConnectionNum() + ",");
+                    }
+                    connections.get(i).send(messageFull);
                 }
-
-        }
-        else if (!connections.isEmpty() && connections.size() >= 2) {
-            for (int i = 0; i < 1; i++) {
-                connections.get(i).send(message + (i+1));
-            }
         }
 
     }
@@ -182,13 +169,21 @@ public class TicTacToeApp extends GameApplication implements MessageHandler<Stri
     public void onReceive(Connection<String> connection, String message) {
         var tokens = message.split(",");
         Arrays.stream(tokens).skip(1).forEach(key -> {
-            if (key.contains("_DOWN")) {
-                getInput().mockButtonPress(MouseButton.PRIMARY,0, 0);
-            } else if (key.contains("_UP")) {
-                getInput().mockButtonRelease(MouseButton.PRIMARY, 18, 18);
+            if (key.matches("LEFT_DOWN")) {
+                int x = Integer.parseInt(tokens[2]);
+                int y = Integer.parseInt(tokens[3]);
+                onUserMove(board[x][y]);
+            }
+            else if(key.matches("X")){
+            symbolChosen = true;
+            clientisX = true;
+            }
+            else if (key.matches("O")){
+                symbolChosen = true;
+                clientisX = false;
             }
         });
-    }
+        }
 
     static class MessageWriterS implements TCPMessageWriter<String> {
 
@@ -310,9 +305,9 @@ public class TicTacToeApp extends GameApplication implements MessageHandler<Stri
         timeline.play();
     }
     private void gameOver(String winner) {
-        getDialogService().showConfirmationBox("Winner: " + winner + "\nContinue?", yes -> {
+        getDialogService().showConfirmationBox("Winner: " + winner + "\nDid you enjoy it?", yes -> {
             if (yes)
-                getGameController().startNewGame();
+                getGameController().exit();
             else
                 getGameController().exit();
         });
@@ -327,6 +322,7 @@ public class TicTacToeApp extends GameApplication implements MessageHandler<Stri
             tile.getComponent(GridCellComponent.class).mark(TileValue.O);
             playerXTurn = true;
             }
+        clientisX = !clientisX;
         checkGameFinished();
         toString();
         }
